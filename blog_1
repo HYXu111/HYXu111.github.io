@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qt4 错误解决方案</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        h1 {
+            color: #2c3e50;
+            margin-top: 0;
+            font-size: 24px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        p {
+            margin-bottom: 15px;
+        }
+        .language-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .language-toggle button {
+            padding: 8px 16px;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+        .language-toggle button:hover {
+            background-color: #e9ecef;
+        }
+        .language-toggle button.active {
+            background-color: #e9ecef;
+            border-color: #adb5bd;
+            font-weight: bold;
+        }
+        .content {
+            display: none;
+        }
+        .content.active {
+            display: block;
+        }
+        .solution {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        code, .path {
+            font-family: Consolas, 'Courier New', monospace;
+            background-color: #f1f1f1;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 15px;
+        }
+        .back-home {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 8px 16px;
+            background-color: #f1f1f1;
+            border-radius: 4px;
+            color: #333;
+            text-decoration: none;
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+        .back-home:hover {
+            background-color: #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="language-toggle">
+            <button id="btn-en" onclick="showContent('english')">English</button>
+            <button id="btn-zh" onclick="showContent('chinese')">中文</button>
+        </div>
+
+        <div id="english" class="content">
+            <h1>Error: "No pyface.toolkits plugin could be loaded for qt4" on Debian</h1>
+            <p><strong>Problem:</strong> This error occurs when running applications requiring Qt4 on Debian 12+.</p>
+            
+            <div class="solution">
+                <p><strong>Solution:</strong> Set these environment variables:</p>
+                <p><code>export ETS_TOOLKIT=qt</code></p>
+                <p><code>export QT_API=pyqt5</code></p>
+            </div>
+            
+            <p><strong>Note:</strong> Add to <span class="path">~/.bashrc</span> for persistence.</p>
+            
+            <a class="back-home" href="index.html">Back to Home</a>
+        </div>
+
+        <div id="chinese" class="content">
+            <h1>Debian下"No pyface.toolkits plugin could be loaded for qt4"错误</h1>
+            <p><strong>问题：</strong>Debian 12+ 运行需要Qt4的应用时出现此错误。</p>
+            
+            <div class="solution">
+                <p><strong>解决方案：</strong>设置以下环境变量：</p>
+                <p><code>export ETS_TOOLKIT=qt</code></p>
+                <p><code>export QT_API=pyqt5</code></p>
+            </div>
+            
+            <p><strong>注意：</strong>添加到 <span class="path">~/.bashrc</span> 可永久生效。</p>
+            
+            <a class="back-home" href="index.html">回首页</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var userLang = navigator.language || navigator.userLanguage;
+            var btnEn = document.getElementById('btn-en');
+            var btnZh = document.getElementById('btn-zh');
+            
+            // 初始显示设置
+            if (userLang.startsWith('zh')) {
+                showContent('chinese');
+                btnZh.classList.add('active');
+            } else {
+                showContent('english');
+                btnEn.classList.add('active');
+            }
+        });
+
+        function showContent(language) {
+            // 隐藏所有内容
+            document.querySelectorAll('.content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 显示选中内容
+            document.getElementById(language).classList.add('active');
+            
+            // 更新按钮状态
+            document.querySelectorAll('.language-toggle button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.language-toggle button[id="btn-${language.substr(0,2)}"]`).classList.add('active');
+        }
+    </script>
+</body>
+</html>
