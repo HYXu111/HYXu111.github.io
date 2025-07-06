@@ -242,9 +242,9 @@
             for (let i = 0; i < gamepads.length; ++i) {
                 const gp = gamepads[i];
                 if (gp) {
-                    console.log(gp.id);
-                    console.log(gp.buttons);
-                    console.log(gp.axes);
+                    // console.log(gp.id);
+                    // console.log(gp.buttons);
+                    // console.log(gp.axes);
                     updateJoystick("j-left", gp.axes[0], gp.axes[1]);
                     updateJoystick("j-right", gp.axes[2], gp.axes[3]);
 
@@ -277,7 +277,7 @@
                 }
             }
         }
-        setInterval(updateGamepadStatus, 1000);
+        setInterval(updateGamepadStatus, 100);
         function updateJoystick(j_id, x, y) { // 左右摇杆
             const knob = document.getElementById(j_id);
             knob.setAttribute("cx", x);
