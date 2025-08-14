@@ -22,10 +22,10 @@
     <div id="math-cont4"></div>
     <script>
         $(document).ready(function(){
-            katex.render("u = \\frac{1}{3}(2U - V)", $("#math-cont1"));
-            katex.render("v = \\frac{1}{3}(2V - U)", $("#math-cont2"));
-            katex.render("t = -(u + v)", $("#math-cont3"));
-            katex.render("w = W", $("#math-cont4"));
+            katex.render("u = \\frac{1}{3}(2U - V)", document.getElementById("math-cont1"));
+            katex.render("v = \\frac{1}{3}(2V - U)", document.getElementById("math-cont2"));
+            katex.render("t = -(u + v)", document.getElementById("math-cont3"));
+            katex.render("w = W", document.getElementById("math-cont4"));
         });
     </script>
     <script>
