@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="/jquery371.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.js"></script>
+</head>
+<body>
+    HCP换算
+    HCP converter
+    <p>UVW=<input type="number" id="U"><input type="number" id="V"><input type="number" id="W"></p>
+    <p>uvtw=<input type="number" id="u"><input type="number" id="v"><input type="number" id="t"><input type="number" id="w"></p>
+    <input type="button" value="UVW to uvtw" onclick="trans_uvw(false);">
+    <input type="button" value="uvtw to UVW" onclick="trans_uvw(true);">
+    <p>function:</p>
+    <div id="math-cont1"></div>
+    <div id="math-cont2"></div>
+    <div id="math-cont3"></div>
+    <div id="math-cont4"></div>
+    <script>
+        $(document).ready(function(){
+            katex.render("u = \frac{1}{3}(2U - V)", $("#math-cont1"));
+            katex.render("v = \frac{1}{3}(2V - U)", $("#math-cont2"));
+            katex.render("t = -(u + v)", $("#math-cont3"));
+            katex.render("w = W", $("#math-cont4"));
+        });
+    </script>
+    <script>
+        function trans_uvw(direct){
+                let u, v, t, w;
+                let uu, uv, uw;
+                if (direct) {
+                    u = $("#u").val();
+                    v = $("#v").val();
+                    t = $("#t").val();
+                    w = $("#w").val();
+                    u = parseInt(u);
+                    v = parseInt(v);
+                    t = parseInt(t);
+                    w = parseInt(w);
+
+                    uu = 2 * u + v;
+                    uv = u + 2 * v;
+                    uw = w;
+                    $("#U").val(uu);
+                    $("#V").val(uv);
+                    $("#W").val(uw);
+                    console.log("uvtw=", u, v, t, w);
+                    console.log("UVW=", uu, uv, uw);
+                } else {
+                    uu = $("#U").val();
+                    uv = $("#V").val();
+                    uw = $("#W").val();
+                    uu = parseInt(uu);
+                    uv = parseInt(uv);
+                    uw = parseInt(uw);
+                    u = 1/3 * (2 * uu - uv);
+                    v = 1/3 * (2 * uv - uu);
+                    t = - (u + v);
+                    w = uw;
+                    $("#u").val(u);
+                    $("#v").val(v);
+                    $("#t").val(t);
+                    $("#w").val(w);
+                    console.log("UVW=", uu, uv, uw);
+                    console.log("uvtw=", u, v, t, w);
+                }
+            }
+    </script>
+</body>
+</html>
