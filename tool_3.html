@@ -1,0 +1,685 @@
+<!-- euler_trans_beauty.html -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>欧拉角转换器 | Euler Angle Converter</title>
+    <link rel="stylesheet" href="/font-awesome640.min.css">
+    <link rel="stylesheet" href="/katex.min.css">
+    <script defer src="/katex0_10_1.js"></script>
+    <script src="/jquery371.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #eef2f6 100%);
+            color: #1e293b;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+            padding: 40px;
+            width: 100%;
+            max-width: 900px;
+            position: relative;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #1e293b;
+            margin-bottom: 30px;
+            font-weight: 700;
+            font-size: 2.4rem;
+            padding: 0 50px;
+        }
+        
+        .lang-toggle {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+        
+        .lang-toggle:hover {
+            background: #e2e8f0;
+        }
+        
+        .section {
+            background-color: #f8fafc;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .section-title {
+            font-size: 1.2rem;
+            color: #334155;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            color: #3b82f6;
+            font-size: 1.3rem;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        select, input, button {
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 12px 18px;
+            font-size: 1.05rem;
+            background-color: white;
+            outline: none;
+            height: 48px;
+        }
+        
+        select {
+            flex: 1;
+            min-width: 160px;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+            padding-right: 45px;
+        }
+        
+        input[type="number"] {
+            width: 100px;
+            text-align: center;
+            -moz-appearance: textfield;
+        }
+        
+        /* 移除数字输入框的增减按钮 */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        
+        input:focus, select:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+        
+        button {
+            background-color: #3b82f6;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            padding: 12px 30px;
+            min-width: 120px;
+        }
+        
+        button:hover {
+            background-color: #2563eb;
+        }
+        
+        .disabled-input {
+            background-color: #f1f5f9;
+            color: #64748b;
+            cursor: not-allowed;
+        }
+        
+        #rotate_matrix {
+            font-family: 'Courier New', monospace;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            margin-top: 10px;
+            line-height: 1.8;
+            font-size: 1.2rem;
+            overflow-x: auto;
+            white-space: pre;
+        }
+        
+        #quat {
+            font-family: 'Courier New', monospace;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            margin-top: 10px;
+            line-height: 1.8;
+            font-size: 1.2rem;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #64748b;
+            font-size: 0.95rem;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .footer a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .matrix-container {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+        }
+        
+        .matrix {
+            display: inline-block;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .matrix-row {
+            display: flex;
+            justify-content: center;
+        }
+        
+        .matrix-cell {
+            width: 90px;
+            text-align: center;
+            padding: 10px 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+        }
+        
+        .input-description {
+            display: block;
+            margin-bottom: 10px;
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 1.9rem;
+                padding: 0 20px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .input-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            select, input, button {
+                width: 100%;
+            }
+            
+            .lang-toggle {
+                top: 20px;
+                right: 20px;
+            }
+        }
+        
+        /* 语言切换样式 */
+        .lang-en .zh {
+            display: none;
+        }
+        
+        .lang-zh .en {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="lang-toggle" id="langToggle" onclick="change_lang();">
+            <i class="fas fa-globe"></i>
+            <span class="zh">中文</span>
+            <span class="en">English</span>
+        </button>
+        
+        <h1>
+            <span class="zh">欧拉角转换器</span>
+            <span class="en">Euler Angle Converter</span>
+        </h1>
+        
+        <!-- 用户输入 -->
+        <div class="section">
+            <div class="section-title">
+                <i class="fas fa-cog"></i>
+                <span class="zh">选择旋转顺序并输入旋转角度</span>
+                <span class="en">Select rotation order and input angles</span>
+            </div>
+            <div class="input-group">
+                <select id="src_sel"></select>
+                <input type="number" id="e1" value="0" placeholder="角度" onchange="limit_input('e1');">
+                <input type="number" id="e2" value="0" placeholder="角度" onchange="limit_input('e2');">
+                <input type="number" id="e3" value="0" placeholder="角度" onchange="limit_input('e3');">
+                <button id="cal_btn" onclick="limit_input('e1');limit_input('e2');limit_input('e3');recal();">
+                    <span class="zh">计算</span>
+                    <span class="en">Calculate</span>
+                </button>
+            </div>
+            <div style="color: red;" id="limit_note" hidden="hidden">
+                <span class="zh">请输入-180到180之间的值后再计算</span>
+                <span class="en">Enter a value between -180 and 180 to calculate.</span>
+            </div>
+        </div>
+        
+        <!-- 旋转矩阵显示 -->
+        <div class="section">
+            <div class="section-title">
+                <i class="fas fa-border-all"></i>
+                <span class="zh">旋转矩阵</span>
+                <span class="en">Rotation Matrix</span>
+            </div>
+            <div id="rotate_matrix"></div>
+        </div>
+        
+        <!-- 四元数 -->
+        <div class="section" hidden="hidden">
+            <div class="section-title">
+                <i class="fas fa-superscript"></i>
+                <span class="zh">四元数</span>
+                <span class="en">Quaternion</span>
+            </div>
+            <p id="quat"></p>
+        </div>
+        
+        <!-- 新欧拉角 -->
+        <div class="section">
+            <div class="section-title">
+                <i class="fas fa-exchange-alt"></i>
+                <span class="zh">转换后的欧拉角</span>
+                <span class="en">Converted Euler Angles</span>
+            </div>
+            <div class="input-group">
+                <select id="src_sel_new"></select>
+                <input type="number" id="e1_new" disabled="disabled" class="disabled-input" placeholder="结果">
+                <input type="number" id="e2_new" disabled="disabled" class="disabled-input" placeholder="结果">
+                <input type="number" id="e3_new" disabled="disabled" class="disabled-input" placeholder="结果">
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>
+                <span class="zh">本程序算法来自</span>
+                <span class="en">Algorithm from</span>
+                <a href="https://en.wikipedia.org/wiki/Euler_angles">wikipedia</a>
+            </p>
+        </div>
+    </div>
+    
+<script>
+function angle_to_arc(angle){
+    return Math.PI * angle / 180;
+}
+function arc_to_angle(arc){
+    return 180 * arc / Math.PI;
+}
+function matmul(mat1, mat2){
+    // 矩阵乘法 mat1 x mat2
+    let mat1_r = mat1.length;
+    let mat1_c = mat1[0].length;
+    let mat2_r = mat2.length;
+    let mat2_c = mat2[0].length;
+    if (mat1_c != mat2_r){
+        console.error("矩阵无法相乘");
+        return;
+    }
+    let final_mat = [];
+    let val_sum = 0;
+    let row_vec = [];
+    for (var c=0;c<mat2_c;c++){
+        row_vec = [];
+        for (var r=0;r<mat1_r;r++){
+            // c行r列
+            // 矩阵1 c行j列 矩阵2 i行r列
+            // j == i
+            val_sum = 0;
+            for (var j=0;j<mat1_c;j++){
+                val_sum += mat1[c][j] * mat2[j][r];
+            }
+            row_vec.push(val_sum);
+        }
+        final_mat.push(row_vec);
+    }
+    return final_mat;
+}
+const axis = {
+    "x": 0,
+    "y": 1,
+    "z": 2,
+    "e": 10 // 单位阵
+}
+const cos = Math.cos;
+const sin = Math.sin;
+
+function get_rotate_mat_axis(ax, rotate_angle){
+    // ax: enum axis, axis.x axis.y axis.z
+    // rotate_angle: int
+    let arc = angle_to_arc(rotate_angle);
+    let mat;
+    if (ax == axis.x){
+        mat = [
+            [1., 0., 0.],
+            [0., cos(arc), -sin(arc)],
+            [0., sin(arc),cos(arc)]
+        ];
+    }else if (ax == axis.y){
+        mat = [
+            [cos(arc), 0., sin(arc)],
+            [0., 1., 0.],
+            [-sin(arc), 0., cos(arc)]
+        ];
+    }else if (ax == axis.z){
+        mat = [
+            [cos(arc), -sin(arc), 0.],
+            [sin(arc), cos(arc), 0.],
+            [0., 0., 1.]
+        ];
+    }else if (ax == axis.e){
+        mat = [
+            [1., 0., 0.],
+            [0., 1., 0.],
+            [0., 0., 1.]
+        ];
+    }else{
+        console.error("不存在的轴", ax);
+        return;
+    }
+    return mat;
+}
+
+const rotate_seq = {
+    "XZX": 131,
+    "XYX": 121,
+    "YXY": 212,
+    "YZY": 232,
+    "ZYZ": 323,
+    "ZXZ": 313,
+    "XZY": 132,
+    "XYZ": 123,
+    "YXZ": 213,
+    "YZX": 231,
+    "ZYX": 321,
+    "ZXY": 312
+}
+let rotate_mat = null;
+function render_mat(mat) {
+    // 提供mxn矩阵渲染字符串
+    // mat = [[x11, x12, x13], [x21, x22, x23], [x31, x32, x33]]
+    let s_mat = "";
+    let mat_tmp = [];
+    for (var j=0;j<mat.length;j++) {
+        for (var i=0;i<mat[0].length;i++) {
+            mat[i][j] = mat[i][j].toFixed(2);
+        }
+    }
+
+    for (var j=0;j<3;j++) {
+        mat_tmp.push(mat[j].join(" & "));
+    }
+    s_mat = mat_tmp.join(" \\\\");
+    let s = "\\begin{bmatrix} " + s_mat + " \\end{bmatrix}";
+    return s;
+}
+function update_mat(mat, ele_id) {
+    // 将矩阵渲染至指定位置
+    katex.render(render_mat(mat), document.getElementById(ele_id));
+}
+function euler_to_matrix(){
+    // 欧拉角到旋转矩阵
+    let e1 = $("#e1").val();
+    let e2 = $("#e2").val();
+    let e3 = $("#e3").val();
+    let rotate_mode = $("#src_sel").val();
+    rotate_mode = `${rotate_mode}`;
+    rotate_mode = [parseInt(rotate_mode[0])-1, parseInt(rotate_mode[1])-1, parseInt(rotate_mode[2])-1];
+    console.log("用户选中模式", rotate_mode);
+    e1 = get_rotate_mat_axis(rotate_mode[0], e1);
+    e2 = get_rotate_mat_axis(rotate_mode[1], e2);
+    e3 = get_rotate_mat_axis(rotate_mode[2], e3);
+    let final_mat = matmul(e1, e2);
+    final_mat = matmul(final_mat, e3);
+    console.log("旋转矩阵:", final_mat);
+    rotate_mat = final_mat;
+    // 渲染旋转矩阵
+    update_mat(final_mat, "rotate_matrix");
+}
+
+function matrix_to_euler(){
+    // 从旋转矩阵计算用户选中的欧拉角
+    let e1, e2, e3;
+    let rotate_mode = $("#src_sel_new").val();
+    console.log("用户选中目标模式", rotate_mode);
+    console.log($("#src_sel").val() == rotate_mode ? "模式相同" : "模式不同");
+    if (rotate_mode == 131){
+        e1 = Math.atan2(rotate_mat[2][0], rotate_mat[1][0]); // s2s1/s2c1 = t1
+        e3 = Math.atan2(rotate_mat[0][2], -rotate_mat[0][1]); // s2s3/-s2c3 = -s3/c3 = -t3
+        e2 = Math.acos(rotate_mat[0][0]);
+
+        e1 = arc_to_angle(e1);
+        e2 = arc_to_angle(e2);
+        e3 = arc_to_angle(e3);
+        console.log("模式: XZX, 欧拉角:", e1, e2, e3);
+    }else if (rotate_mode == 121){
+        e1 = Math.atan2(rotate_mat[1][0], -rotate_mat[2][0]);
+        e3 = Math.atan2(rotate_mat[0][1], rotate_mat[0][2]);
+        e2 = Math.acos(rotate_mat[0][0]);
+
+        e1 = arc_to_angle(e1);
+        e2 = arc_to_angle(e2);
+        e3 = arc_to_angle(e3);
+        console.log("模式: XYX, 欧拉角:", e1, e2, e3);
+    }else if (rotate_mode == 212){
+        e1 = Math.atan2(rotate_mat[0][1], rotate_mat[2][1]);
+        e3 = Math.atan2(rotate_mat[1][0], -rotate_mat[1][2]);
+        e2 = Math.acos(rotate_mat[1][1]);
+
+        e1 = arc_to_angle(e1);
+        e2 = arc_to_angle(e2);
+        e3 = arc_to_angle(e3);
+        console.log("模式: YXY, 欧拉角:", e1, e2, e3);
+    }else if (rotate_mode == 232){
+        e1 = Math.atan2(rotate_mat[2][1], -rotate_mat[0][1]);
+        e3 = Math.atan2(rotate_mat[1][2], rotate_mat[1][0]);
+        e2 = Math.acos(rotate_mat[1][1]);
+
+        e1 = arc_to_angle(e1);
+        e2 = arc_to_angle(e2);
+        e3 = arc_to_angle(e3);
+        console.log("模式: YZY, 欧拉角:", e1, e2, e3);
+    }else if (rotate_mode == 323){
+        e1 = Math.atan2(rotate_mat[1][2], rotate_mat[0][2]);
+        e3 = Math.atan2(rotate_mat[2][1], -rotate_mat[2][0]);
+        e2 = Math.atan2((1 - rotate_mat[2][2] ** 2.) ** 0.5, rotate_mat[2][2]);
+
+        e1 = arc_to_angle(e1);
+        e2 = arc_to_angle(e2);
+        e3 = arc_to_angle(e3);
+        console.log("模式: ZYZ, 欧拉角:", e1, e2, e3);
+    }else if (rotate_mode == 313){
+        e1 = Math.atan2(rotate_mat[0][2], -rotate_mat[1][2]);
+        e3 = Math.atan2(rotate_mat[2][0], rotate_mat[2][1]);
+        e2 = Math.acos(rotate_mat[2][2]);
+
+        e1 = arc_to_angle(e1);
+        e2 = arc_to_angle(e2);
+        e3 = arc_to_angle(e3);
+        console.log("模式: ZXZ, 欧拉角:", e1, e2, e3);
+    }else if (rotate_mode == 132){
+        e1 = Math.atan2(rotate_mat[2][1], rotate_mat[1][1]);
+        e3 = Math.atan2(rotate_mat[0][2], rotate_mat[0][0]);
+        e2 = Math.asin(-rotate_mat[0][1]);
+
+        e1 = arc_to_angle(e1);
+        e2 = arc_to_angle(e2);
+        e3 = arc_to_angle(e3);
+        console.log("模式: XZY, 欧拉角:", e1, e2, e3);
+    }else if (rotate_mode == 123){
+        e1 = Math.atan2(-rotate_mat[1][2], rotate_mat[2][2]);
+        e3 = Math.atan2(-rotate_mat[0][1], rotate_mat[0][0]);
+        e2 = Math.asin(rotate_mat[0][2]);
+
+        e1 = arc_to_angle(e1);
+        e2 = arc_to_angle(e2);
+        e3 = arc_to_angle(e3);
+        console.log("模式: XYZ, 欧拉角:", e1, e2, e3);
+    }else if (rotate_mode == 213){
+        e1 = Math.atan2(rotate_mat[0][2], rotate_mat[2][2]);
+        e3 = Math.atan2(rotate_mat[1][0], rotate_mat[1][1]);
+        e2 = Math.asin(-rotate_mat[1][2]);
+
+        e1 = arc_to_angle(e1);
+        e2 = arc_to_angle(e2);
+        e3 = arc_to_angle(e3);
+        console.log("模式: YXZ, 欧拉角:", e1, e2, e3);
+    }else if (rotate_mode == 231){
+        e1 = Math.atan2(-rotate_mat[2][0], rotate_mat[0][0]);
+        e3 = Math.atan2(-rotate_mat[1][2], rotate_mat[1][1]);
+        e2 = Math.asin(rotate_mat[1][0]);
+
+        e1 = arc_to_angle(e1);
+        e2 = arc_to_angle(e2);
+        e3 = arc_to_angle(e3);
+        console.log("模式: YZX, 欧拉角:", e1, e2, e3);
+    }else if (rotate_mode == 321){
+        e1 = Math.atan2(rotate_mat[1][0], rotate_mat[0][0]);
+        e3 = Math.atan2(rotate_mat[2][1], rotate_mat[2][2]);
+        e2 = Math.asin(-rotate_mat[2][0]);
+
+        e1 = arc_to_angle(e1);
+        e2 = arc_to_angle(e2);
+        e3 = arc_to_angle(e3);
+        console.log("模式: ZYX, 欧拉角:", e1, e2, e3);
+    }else if (rotate_mode == 312){
+        e1 = Math.atan2(-rotate_mat[0][1], rotate_mat[1][1]);
+        e3 = Math.atan2(-rotate_mat[2][0], rotate_mat[2][2]);
+        e2 = Math.asin(rotate_mat[2][1]);
+
+        e1 = arc_to_angle(e1);
+        e2 = arc_to_angle(e2);
+        e3 = arc_to_angle(e3);
+        console.log("模式: ZXY, 欧拉角:", e1, e2, e3);
+    }else{
+        console.error("不存在的模式");
+        return;
+    }
+    $("#e1_new").val(e1.toFixed(2));
+    $("#e2_new").val(e2.toFixed(2));
+    $("#e3_new").val(e3.toFixed(2));
+}
+
+function recal(){
+    // 全部重新计算
+    if ($("#limit_note").is(":hidden")){
+        euler_to_matrix();
+        matrix_to_euler();
+    }
+}
+
+let input_valid = [true, true, true];
+
+function limit_input(dom_id){
+    // 限制用户输入在[-180,180)
+    let obj = $("#"+dom_id);
+    let input_val = parseFloat(obj.val());
+    if (input_val < -180. || input_val >= 180.){
+        if (dom_id == "e1"){
+            input_valid[0] = false;
+        }else if (dom_id == "e2"){
+            input_valid[1] = false;
+        }else if (dom_id == "e3"){
+            input_valid[2] = false;
+        }
+    }else{
+        if (dom_id == "e1"){
+            input_valid[0] = true;
+        }else if (dom_id == "e2"){
+            input_valid[1] = true;
+        }else if (dom_id == "e3"){
+            input_valid[2] = true;
+        }
+    }
+    console.log("输入检查:", input_valid);
+    if (input_valid[0] && input_valid[1] && input_valid[2]){
+        $("#limit_note").hide();
+    }else{
+        $("#limit_note").show();
+    }
+}
+
+function change_lang() {
+    if (show_lang == "en"){
+        show_lang = "zh";
+        $(".en").hide();
+        $(".zh").show();
+    }else{
+        show_lang = "en";
+        $(".zh").hide();
+        $(".en").show();
+    }
+}
+
+let show_lang = "zh";
+$(document).ready(function(){
+    // 中英文切换
+    const browserLang = navigator.language || navigator.userLanguage;
+    if (browserLang.startsWith("zh")){
+        show_lang = "zh";
+        $(".en").hide();
+    }else{
+        show_lang = "en";
+        $(".zh").hide();
+    }
+    // 添加option
+    for (let op_t in rotate_seq){
+        let op_val = rotate_seq[op_t];
+        $("#src_sel").append(`<option value="${op_val}">${op_t}</option>`);
+        $("#src_sel_new").append(`<option value="${op_val}">${op_t}</option>`);
+    }
+    recal();
+});
+</script>
+</body>
+</html>
